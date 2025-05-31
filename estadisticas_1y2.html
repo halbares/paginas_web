@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadística Descriptiva - Guía Interactiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .content-section {
+            border-left-width: 4px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .calculator-input, .data-input {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            margin-right: 5px;
+            margin-bottom: 5px; /* Added for better spacing */
+        }
+        .data-input {
+            width: calc(100% - 10px); /* Adjust width for data input */
+        }
+        .calculator-input {
+             width: 120px; /* Specific width for calculator inputs */
+        }
+        .formula {
+            background-color: #e0e7ff; /* Light indigo background for formulas */
+            color: #3730a3; /* Dark indigo text for formulas */
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Inter', sans-serif; /* Use body font for consistency, MathJax will handle math font */
+            overflow-x: auto; /* For long formulas */
+            font-size: 1.1em; /* Slightly larger font for formulas */
+        }
+        /* Estilos para impresión */
+        @media print {
+            body {
+                font-size: 10pt; /* Adjusted for potentially dense content */
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            nav {
+                display: none !important;
+            }
+            main {
+                margin-left: 0 !important;
+                padding: 10px !important; /* Reduce padding for print */
+            }
+            .content-section {
+                border-left-width: 2px;
+                margin-bottom: 10px; /* Espacio entre secciones en PDF */
+                padding: 10px; /* Reduce padding for print */
+                page-break-inside: avoid; /* Evitar que las secciones se corten entre páginas */
+            }
+            h1, h2, h3, h4 {
+                page-break-after: avoid; /* Evitar saltos de página después de los títulos */
+                color: #000 !important; /* Ensure titles are black for print */
+            }
+            .calculator-container, .interactive-table-container, .advanced-concepts, .graph-placeholder {
+                page-break-inside: avoid;
+            }
+            button, .data-input, .calculator-input { /* Hide interactive elements */
+                display: none !important;
+            }
+            .formula {
+                background-color: #f3f4f6 !important; /* Lighter grey for print */
+                color: #000 !important;
+                border: 1px solid #ccc;
+                 font-size: 1em !important; /* Adjust font size for print if needed */
+            }
+            /* MathJax print adjustments - MathJax usually handles this well, but as a fallback */
+            mjx-container svg {
+                max-width: 100% !important;
+            }
+            img {
+                max-width: 100% !important; /* Ensure images fit */
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 text-slate-800">
+
+    <div class="min-h-screen flex flex-col print-container">
+
+        <header class="bg-indigo-700 text-white p-6 shadow-lg no-print sticky top-0 z-50">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-3xl font-bold">📊 Estadística Descriptiva: Guía Interactiva</h1>
+                <button onclick="imprimirPagina()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                    📄 Descargar como PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="container mx-auto flex flex-grow mt-4">
+            <nav class="w-1/4 p-4 space-y-3 bg-white shadow-md rounded-lg sticky top-24 h-screen overflow-y-auto no-print mr-4">
+                <h2 class="text-xl font-semibold text-indigo-700 mb-4 border-b pb-2">Temario 📈</h2>
+                <ul>
+                    <li><a href="#intro-estadistica" class="block py-2 px-3 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-md transition duration-150">🌍 Introducción</a></li>
+                    <li><a href="#variables" class="block py-2 px-3 text-slate-600 hover:bg-purple-100 hover:text-purple-700 rounded-md transition duration-150">🧬 Variables</a></li>
+                    <li><a href="#tablas-frecuencia" class="block py-2 px-3 text-slate-600 hover:bg-pink-100 hover:text-pink-700 rounded-md transition duration-150">🔢 Tablas de Frecuencia</a></li>
+                    <li><a href="#graficos" class="block py-2 px-3 text-slate-600 hover:bg-teal-100 hover:text-teal-700 rounded-md transition duration-150">📊 Representación Gráfica</a></li>
+                    <li><a href="#medidas-tendencia-central" class="block py-2 px-3 text-slate-600 hover:bg-sky-100 hover:text-sky-700 rounded-md transition duration-150">🎯 Medidas de Tendencia Central</a></li>
+                    <li><a href="#medidas-posicion" class="block py-2 px-3 text-slate-600 hover:bg-amber-100 hover:text-amber-700 rounded-md transition duration-150">📍 Medidas de Posición No Central</a></li>
+                    <li><a href="#medidas-dispersion" class="block py-2 px-3 text-slate-600 hover:bg-lime-100 hover:text-lime-700 rounded-md transition duration-150">↔️ Medidas de Dispersión</a></li>
+                    <li><a href="#medidas-forma" class="block py-2 px-3 text-slate-600 hover:bg-rose-100 hover:text-rose-700 rounded-md transition duration-150">📉 Medidas de Forma</a></li>
+                </ul>
+            </nav>
+
+            <main class="w-3/4 p-6 bg-white shadow-md rounded-lg">
+                
+                <section id="intro-estadistica" class="content-section border-indigo-500 bg-indigo-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-indigo-700 mb-6">🌍 Introducción a la Estadística</h2>
+                    <p class="mb-4 text-lg">La Estadística es una disciplina que proporciona metodologías para <strong class="text-indigo-600">obtener, recopilar, procesar, resumir, presentar e interpretar datos</strong>, permitiendo tomar decisiones informadas.</p>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-indigo-600 mb-2">🔑 Conceptos Fundamentales:</h3>
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                            <li><strong class="text-indigo-500">Universo:</strong> Conjunto total de individuos u objetos de interés en un estudio. Ejemplo: Todas las sandías producidas en una parcela.</li>
+                            <li><strong class="text-indigo-500">Población:</strong> Conjunto de todos los datos o mediciones de una característica específica en cada individuo del universo. Ejemplo: Los pesos de todas las sandías de la parcela.</li>
+                            <li><strong class="text-indigo-500">Muestra:</strong> Subconjunto representativo de la población, seleccionado para el estudio. Ejemplo: Los pesos de 70 sandías seleccionadas de la parcela.</li>
+                            <li><strong class="text-indigo-500">Censo:</strong> Estudio que incluye a todos los elementos de la población.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-indigo-600 mb-2">💡 Dato, Información y Conocimiento:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong>Dato:</strong> Factor objetivo sobre un hecho real (ej. una calificación). No dice nada sobre el porqué y por sí mismo tiene poca relevancia.</li>
+                            <li><strong>Información:</strong> Datos con significado añadido, capaces de cambiar la percepción (ej. promedio de calificaciones).</li>
+                            <li><strong>Conocimiento:</strong> Mezcla de experiencia, valores e información, útil para la acción (ej. entender por qué el promedio es bajo y cómo mejorarlo). El conocimiento se deriva de la información, así como la información se deriva de los datos.</li>
+                        </ul>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-indigo-600 mb-2">⚙️ Método Estadístico (Fases):</h3>
+                        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+                            <li><strong>Diseño del trabajo:</strong> Definición de objetivos, universo, muestra, unidades de observación.</li>
+                            <li><strong>Ejecución del trabajo:</strong> Recopilación de datos, elaboración de información (tabulación, gráficos, resúmenes), análisis de resultados.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section id="variables" class="content-section border-purple-500 bg-purple-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-purple-700 mb-6">🧬 Variables y su Clasificación</h2>
+                    <p class="mb-4 text-lg">Una <strong class="text-purple-600">variable</strong> es una característica que se mide o describe en los individuos de un estudio y que puede tomar diferentes valores.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-purple-600 mb-2">🔢 Variables Cuantitativas:</h3>
+                            <p class="text-slate-700 mb-2">Toman valores numéricos.</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                <li><strong class="text-purple-500">Discretas:</strong> Toman valores finitos o numerables (ej. número de hijos, número de errores). Variables 2 y 5 del ejercicio 2 son cuantitativas discretas.</li>
+                                <li><strong class="text-purple-500">Continuas:</strong> Pueden tomar infinitos valores dentro de un intervalo (ej. peso, altura, tiempo). Variable 4 (tiempo ganador) del ejercicio 2 es cuantitativa continua.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-purple-600 mb-2">🏷️ Variables Cualitativas (Atributos):</h3>
+                            <p class="text-slate-700 mb-2">Describen cualidades o categorías. Variables 1 y 3 del ejercicio 2 son cualitativas.</p>
+                             <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                <li><strong class="text-purple-500">Nominales:</strong> Categorías no ordenables (ej. color de ojos, estado civil, tipo de sangre). Pueden ser dicotómicas (dos categorías, ej. sexo masculino/femenino) o politómicas (más de dos).</li>
+                                <li><strong class="text-purple-500">Ordinales:</strong> Categorías con un orden jerárquico (ej. nivel socioeconómico -bajo, medio, alto-, nivel de satisfacción -malo, regular, bueno-).</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-purple-600 mb-2">⚖️ Escalas de Medición:</h3>
+                        <p class="text-slate-700 mb-2">Determinan las operaciones matemáticas aplicables.</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong>Escala Nominal:</strong> Clasifica en categorías mutuamente excluyentes. Ejemplo: "¿Podrías seleccionar el grado de incomodidad de tu enfermedad? (1) Leve, (2) Moderado, (3) Severo".</li>
+                            <li><strong>Escala Ordinal:</strong> Establece un orden o jerarquía. Ejemplo: Calidad del servicio (1 Excelente, 2 Bueno, ...).</li>
+                            <li><strong>Escala de Intervalos:</strong> Orden y distancias iguales entre valores. El cero es arbitrario (ej. temperatura en Celsius/Fahrenheit).</li>
+                            <li><strong>Escala de Razón:</strong> Todas las propiedades de la escala de intervalo más un cero absoluto (ausencia de la característica). Permite todas las operaciones aritméticas (ej. peso, altura, ingresos).</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="tablas-frecuencia" class="content-section border-pink-500 bg-pink-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-pink-700 mb-6">🔢 Tablas de Frecuencias</h2>
+                    <p class="mb-4 text-lg">Organizan y resumen los datos mostrando la distribución de sus valores.</p>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-pink-600 mb-2">📊 Componentes de una Tabla de Frecuencias:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong class="text-pink-500">$x_i$:</strong> Valores o marcas de clase de la variable.</li>
+                            <li><strong class="text-pink-500">$f_i$ (Frecuencia Absoluta):</strong> Número de veces que aparece cada valor. $\sum f_i = n$ (tamaño de la muestra).</li>
+                            <li><strong class="text-pink-500">$h_i$ (Frecuencia Relativa):</strong> Proporción de veces que aparece cada valor. $h_i = f_i / n$. $\sum h_i = 1$. (Multiplicada por 100 es $h_i\%$).</li>
+                            <li><strong class="text-pink-500">$F_i$ (Frecuencia Absoluta Acumulada):</strong> Suma de frecuencias absolutas de valores $\le x_i$.</li>
+                            <li><strong class="text-pink-500">$H_i$ (Frecuencia Relativa Acumulada):</strong> Suma de frecuencias relativas de valores $\le x_i$. $H_i = F_i / n$.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-pink-600 mb-2">📦 Datos Agrupados (Variables Continuas o Discretas con muchos valores):</h3>
+                         <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong>Rango (R):</strong> $R = \text{Dato Máximo} - \text{Dato Mínimo}$.</li>
+                            <li><strong>Número de Intervalos (k):</strong>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Regla de Sturges: $k = 1 + 3.3 \cdot \log(n)$.</li>
+                                    <li>Regla de la raíz cuadrada: $k \approx \sqrt{n}$. (Generalmente entre 5 y 20).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Amplitud del Intervalo (A):</strong> $A \approx R / k$. (Se suele redondear).</li>
+                            <li><strong>Límites de Intervalo:</strong> Extremos inferior y superior de cada clase.</li>
+                            <li><strong>Marca de Clase ($m_i$):</strong> Punto medio de cada intervalo. $m_i = (\text{Límite Inferior} + \text{Límite Superior}) / 2$.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow calculator-container">
+                        <h3 class="text-xl font-semibold text-pink-600 mb-2">🛠️ Calculadora de Tabla de Frecuencias (Datos Discretos No Agrupados):</h3>
+                        <p class="text-slate-700 mb-2">Ingresa los datos separados por comas (ej: 1,2,2,3,4,4,4,5):</p>
+                        <textarea id="datosTablaFrec" rows="3" class="data-input w-full p-2 border border-pink-300 rounded-md" placeholder="1,2,2,3,1,4,5,2,3,3"></textarea>
+                        <button onclick="generarTablaFrecuencias()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg shadow mt-2">Generar Tabla</button>
+                        <div id="resultadoTablaFrecuencias" class="mt-3 overflow-x-auto"></div>
+                    </div>
+                </section>
+
+                <section id="graficos" class="content-section border-teal-500 bg-teal-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-6">📊 Representación Gráfica</h2>
+                    <p class="mb-4 text-lg">Los gráficos permiten visualizar la información de forma rápida y clara.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-lg shadow graph-placeholder">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">📊 Gráfico de Barras:</h3>
+                            <p class="text-slate-700">Para variables cualitativas o cuantitativas discretas sin agrupar. Barras separadas, altura proporcional a la frecuencia.</p>
+                            <img src="https://placehold.co/400x250/CCFBF1/0D9488?text=Gráfico+de+Barras" alt="Ejemplo de Gráfico de Barras" class="mt-2 rounded-lg shadow-sm mx-auto">
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow graph-placeholder">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">🥧 Gráfico Circular (Torta):</h3>
+                            <p class="text-slate-700">Muestra la proporción de cada categoría. El área de cada sector es proporcional a su frecuencia relativa.</p>
+                            <img src="https://placehold.co/400x250/99F6E4/134E4A?text=Gráfico+Circular" alt="Ejemplo de Gráfico Circular" class="mt-2 rounded-lg shadow-sm mx-auto">
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow graph-placeholder">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">▓ Histograma:</h3>
+                            <p class="text-slate-700">Para variables cuantitativas continuas (o discretas agrupadas en intervalos). Barras juntas, superficie de cada barra proporcional a la frecuencia.</p>
+                            <img src="https://placehold.co/400x250/5EEAD4/115E59?text=Histograma" alt="Ejemplo de Histograma" class="mt-2 rounded-lg shadow-sm mx-auto">
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow graph-placeholder">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">📈 Ojiva:</h3>
+                            <p class="text-slate-700">Gráfico lineal que representa frecuencias acumuladas. Útil para ver cuántos datos están por debajo de cierto valor.</p>
+                            <img src="https://placehold.co/400x250/2DD4BF/134E4A?text=Ojiva" alt="Ejemplo de Ojiva" class="mt-2 rounded-lg shadow-sm mx-auto">
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow graph-placeholder md:col-span-2">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">🌿 Diagrama de Tallo y Hojas:</h3>
+                            <p class="text-slate-700">Muestra la forma de la distribución y conserva los valores individuales. Se divide cada dato en un "tallo" (primeros dígitos) y una "hoja" (último dígito).</p>
+                            <pre class="bg-teal-100 p-2 rounded-md text-sm">
+Ejemplo: Datos: 23, 25, 25, 31, 32, 40
+Tallo | Hojas
+  2   | 3 5 5
+  3   | 1 2
+  4   | 0</pre>
+                            <img src="https://placehold.co/400x200/F0FDFA/0F766E?text=Diagrama+Tallo+y+Hojas" alt="Ejemplo de Diagrama de Tallo y Hojas" class="mt-2 rounded-lg shadow-sm mx-auto">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="medidas-tendencia-central" class="content-section border-sky-500 bg-sky-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-sky-700 mb-6">🎯 Medidas de Tendencia Central</h2>
+                    <p class="mb-4 text-lg">Valores numéricos que localizan el centro de una distribución de datos.</p>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h4 class="text-lg font-semibold text-sky-600 mb-1">Calculadora para Datos No Agrupados:</h4>
+                        <textarea id="datosMTCDes" rows="2" class="data-input w-full p-2 border border-sky-300 rounded-md" placeholder="Ej: 10,12,15,12,11,16,10"></textarea>
+                        <button onclick="calcularMTCD()" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular (No Agrupados)</button>
+                        <div id="resultadoMTCD" class="mt-2 text-slate-700"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-2"> $\overline{x}, \mu$ Media Aritmética (Promedio):</h3>
+                        <p class="text-slate-700">Suma de todos los datos dividida por el número total de datos.</p>
+                        <p class="formula">No Agrupados: $\overline{x} = \frac{\sum x_i}{n}$</p>
+                        <p class="formula">Agrupados (discreta): $\overline{x} = \frac{\sum (x_i \cdot f_i)}{n}$</p>
+                        <p class="formula">Agrupados (continua): $\overline{x} = \frac{\sum (m_i \cdot f_i)}{n}$ (donde $m_i$ es la marca de clase)</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-2"> $M_e, \text{Mdn}$ Mediana:</h3>
+                        <p class="text-slate-700">Valor central de los datos ordenados. Divide la distribución en dos partes iguales (50% de los datos por debajo, 50% por encima).</p>
+                        <p class="text-slate-700 mb-1">No Agrupados: Si n es impar, es el valor central. Si n es par, es el promedio de los dos valores centrales.</p>
+                        <p class="formula">Agrupados: $M_e = L_i + \left( \frac{\frac{n}{2} - F_{i-1}}{f_i} \right) \cdot A$</p>
+                        <small class="text-slate-500">Donde: $L_i$=Límite inferior del intervalo mediano, $n$=total datos, $F_{i-1}$=Frec. abs. acumulada anterior al int. mediano, $f_i$=Frec. abs. del int. mediano, $A$=Amplitud del int. mediano.</small>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-2"> $M_o, \text{Mo}$ Moda:</h3>
+                        <p class="text-slate-700">Valor que aparece con mayor frecuencia. Una distribución puede ser unimodal, bimodal, multimodal o amodal.</p>
+                        <p class="formula">Agrupados: $M_o = L_i + \left( \frac{d_1}{d_1 + d_2} \right) \cdot A$</p>
+                        <small class="text-slate-500">Donde: $L_i$=Límite inferior del intervalo modal, $d_1 = f_i - f_{i-1}$ (frec. modal - frec. anterior), $d_2 = f_i - f_{i+1}$ (frec. modal - frec. posterior), $A$=Amplitud del int. modal.</small>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow calculator-container">
+                        <h4 class="text-lg font-semibold text-sky-600 mb-1">Calculadora para Datos Agrupados (Tabla de Frecuencias):</h4>
+                        <p class="text-slate-600 text-sm mb-2">Ingresa los límites inferiores, superiores y frecuencias de cada intervalo, separados por comas. Cada intervalo en una nueva línea.</p>
+                        <p class="text-slate-500 text-xs mb-2">Ejemplo de formato (Límite Inf, Límite Sup, Frecuencia):<br>10,20,5<br>20,30,12<br>30,40,8</p>
+                        <textarea id="datosMTC Agr" rows="4" class="data-input w-full p-2 border border-sky-300 rounded-md" placeholder="Límite Inf, Límite Sup, Frecuencia (cada intervalo en nueva línea)"></textarea>
+                        <button onclick="calcularMTCAgrupados()" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular (Agrupados)</button>
+                        <div id="resultadoMTCAgrupados" class="mt-2 text-slate-700"></div>
+                    </div>
+                </section>
+
+                <section id="medidas-posicion" class="content-section border-amber-500 bg-amber-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-amber-700 mb-6">📍 Medidas de Posición No Central (Percentiles)</h2>
+                    <p class="mb-4 text-lg">Valores que dividen un conjunto de datos ordenados en partes iguales.</p>
+                    <ul class="list-disc list-inside space-y-1 text-slate-700 mb-4">
+                        <li><strong class="text-amber-600">Cuartiles ($Q_1, Q_2, Q_3$):</strong> Dividen los datos en 4 partes iguales (25% cada una). $Q_2$ es la Mediana.</li>
+                        <li><strong class="text-amber-600">Deciles ($D_1, ..., D_9$):</strong> Dividen los datos en 10 partes iguales (10% cada una). $D_5$ es la Mediana.</li>
+                        <li><strong class="text-amber-600">Percentiles ($P_1, ..., P_{99}$):</strong> Dividen los datos en 100 partes iguales (1% cada una). $P_{50}$ es la Mediana.</li>
+                    </ul>
+                    <div class="bg-white p-4 rounded-lg shadow calculator-container">
+                        <h3 class="text-xl font-semibold text-amber-600 mb-2">📏 Cálculo de Percentil $P_k$ (Datos Agrupados):</h3>
+                        <p class="text-slate-700 mb-1">Primero, encontrar la posición: $Pos = \frac{k \cdot n}{100}$.</p>
+                        <p class="formula">$P_{k\%} = L_i + \left( \frac{Pos - F_{i-1}}{f_i} \right) \cdot A$</p>
+                        <small class="text-slate-500">Donde: $L_i$=Límite inferior del intervalo del percentil, $Pos$=Posición del percentil, $F_{i-1}$=Frec. abs. acumulada anterior al int. del percentil, $f_i$=Frec. abs. del int. del percentil, $A$=Amplitud del int. del percentil.</small>
+                        <h4 class="text-lg font-semibold text-amber-600 mt-3 mb-1">Calculadora de Percentil (Datos Agrupados):</h4>
+                        <p class="text-slate-600 text-sm mb-2">Usa la tabla de frecuencias ingresada en "Medidas de Tendencia Central (Agrupados)".</p>
+                        <div>
+                            <label for="valorKPercentil" class="text-sm font-medium text-slate-700">Valor de k para $P_k$ (1-99):</label>
+                            <input type="number" id="valorKPercentil" class="calculator-input" value="75" min="1" max="99">
+                        </div>
+                        <button onclick="calcularPercentilAgrupados()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular Percentil</button>
+                        <div id="resultadoPercentilAgrupados" class="mt-2 text-slate-700"></div>
+                    </div>
+                </section>
+
+                <section id="medidas-dispersion" class="content-section border-lime-500 bg-lime-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-lime-700 mb-6">↔️ Medidas de Dispersión</h2>
+                    <p class="mb-4 text-lg">Miden el grado de separación o variabilidad de los datos respecto a un valor central (generalmente la media).</p>
+                     <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h4 class="text-lg font-semibold text-lime-600 mb-1">Calculadora para Datos No Agrupados:</h4>
+                        <textarea id="datosMDDes" rows="2" class="data-input w-full p-2 border border-lime-300 rounded-md" placeholder="Ej: 10,12,15,12,11,16,10"></textarea>
+                        <button onclick="calcularMDD()" class="bg-lime-500 hover:bg-lime-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular (No Agrupados)</button>
+                        <div id="resultadoMDD" class="mt-2 text-slate-700"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-lime-600 mb-2">📏 Rango (Recorrido):</h3>
+                        <p class="text-slate-700">Diferencia entre el valor máximo y el valor mínimo. $R = x_{max} - x_{min}$. Es sensible a valores extremos.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-lime-600 mb-2"> $S^2, \sigma^2$ Varianza:</h3>
+                        <p class="text-slate-700">Promedio de las desviaciones cuadradas de cada dato respecto a la media. Mide la dispersión promedio al cuadrado.</p>
+                        <p class="formula">Poblacional ($\sigma^2$): $\sigma^2 = \frac{\sum (x_i - \mu)^2}{N}$</p>
+                        <p class="formula">Muestral ($S^2$): $S^2 = \frac{\sum (x_i - \overline{x})^2}{n}$ (o $n-1$ para estimador insesgado)</p>
+                        <p class="formula">Agrupados (muestral, con $n$): $S^2 = \frac{\sum f_i(m_i - \overline{x})^2}{n}$</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-lime-600 mb-2"> $S, \sigma$ Desviación Estándar (Típica):</h3>
+                        <p class="text-slate-700">Raíz cuadrada positiva de la varianza. Se expresa en las mismas unidades que los datos originales.</p>
+                        <p class="formula">$S = \sqrt{S^2}$  o  $\sigma = \sqrt{\sigma^2}$</p>
+                        <p class="text-slate-700">Interpretación: $(\overline{x} \pm S)$ suele contener un porcentaje significativo de los datos (aprox. 68% en distribuciones normales).</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-lime-600 mb-2"> CV Coeficiente de Variación:</h3>
+                        <p class="text-slate-700">Medida de dispersión relativa (adimensional). Útil para comparar la variabilidad de conjuntos de datos con diferentes medias o unidades.</p>
+                        <p class="formula">$CV = \frac{S}{\overline{x}}$ (o $CV\% = \frac{S}{\overline{x}} \cdot 100$)</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow calculator-container">
+                        <h4 class="text-lg font-semibold text-lime-600 mb-1">Calculadora para Datos Agrupados (Tabla de Frecuencias):</h4>
+                        <p class="text-slate-600 text-sm mb-2">Usa la tabla de frecuencias ingresada en "Medidas de Tendencia Central (Agrupados)".</p>
+                        <button onclick="calcularMDAgrupados()" class="bg-lime-500 hover:bg-lime-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular (Agrupados)</button>
+                        <div id="resultadoMDAgrupados" class="mt-2 text-slate-700"></div>
+                    </div>
+                </section>
+
+                <section id="medidas-forma" class="content-section border-rose-500 bg-rose-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-rose-700 mb-6">📉 Medidas de Forma</h2>
+                    <p class="mb-4 text-lg">Describen la forma de la distribución de los datos.</p>
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-rose-600 mb-2">🏹 Asimetría (Sesgo):</h3>
+                        <p class="text-slate-700 mb-1">Indica si la distribución es simétrica o se inclina hacia un lado.</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong>Simétrica:</strong> Media $\approx$ Mediana $\approx$ Moda. ($A_p \approx 0$)</li>
+                            <li><strong>Asimétrica Positiva (a la derecha):</strong> Media > Mediana > Moda. ($A_p > 0$) (Cola larga a la derecha)</li>
+                            <li><strong>Asimétrica Negativa (a la izquierda):</strong> Media < Mediana < Moda. ($A_p < 0$) (Cola larga a la izquierda)</li>
+                        </ul>
+                        <p class="formula">Coeficiente de Asimetría de Pearson: $A_p = \frac{\overline{x} - M_o}{S}$  o  $A_p = \frac{3(\overline{x} - M_e)}{S}$</p>
+                        <img src="https://placehold.co/600x200/FFE4E6/DC2626?text=Tipos+de+Asimetría" alt="Ejemplos de Asimetría" class="mt-2 rounded-lg shadow-sm mx-auto">
+                         <div class="calculator-container mt-3">
+                             <h4 class="text-md font-semibold text-rose-600 mb-1">Calculadora Coef. Asimetría de Pearson:</h4>
+                             <p class="text-slate-600 text-sm mb-2">Usa los valores calculados en las secciones anteriores (Media, Moda/Mediana, Desv. Estándar).</p>
+                             <button onclick="calcularAsimetria()" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-3 rounded-lg shadow mt-2">Calcular Asimetría</button>
+                             <div id="resultadoAsimetria" class="mt-2 text-slate-700"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-rose-600 mb-2">⛰️ Curtosis (Apuntamiento):</h3>
+                        <p class="text-slate-700 mb-1">Compara la concentración de datos alrededor del centro con la de los extremos, en relación a la distribución normal (mesocúrtica).</p>
+                         <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong>Leptocúrtica:</strong> Más apuntada que la normal (mayor concentración central, colas más pesadas). $K > 0$ (según la fórmula ajustada $K \approx 0.5$).</li>
+                            <li><strong>Mesocúrtica:</strong> Similar a la normal. $K \approx 0$.</li>
+                            <li><strong>Platicúrtica:</strong> Más achatada que la normal (menor concentración central, colas más ligeras). $K < 0$ (según la fórmula ajustada $K \approx -0.5$).</li>
+                        </ul>
+                        <p class="formula">Una forma de medirla (basada en percentiles): $K=\frac{P_{75} - P_{25}}{P_{90} - P_{10}} - 0,5$ (Si K tiende a 0 es normal, a 0.5 leptocúrtica, a -0.5 platicúrtica).</p>
+                         <img src="https://placehold.co/600x250/FFE4E6/BE123C?text=Tipos+de+Curtosis" alt="Ejemplos de Curtosis" class="mt-2 rounded-lg shadow-sm mx-auto">
+                    </div>
+                </section>
+
+                <p class="text-center text-sm text-slate-500 mt-8">Fin del material de estudio de Estadística Descriptiva. ¡Mucho éxito! 🚀</p>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- Funciones Auxiliares ---
+        function parseData(inputId) {
+            const rawData = document.getElementById(inputId).value.trim();
+            if (!rawData) return [];
+            return rawData.split(',').map(Number).filter(n => !isNaN(n));
+        }
+
+        function parseGroupedData(inputId) {
+            const rawData = document.getElementById(inputId).value.trim();
+            if (!rawData) return [];
+            const lines = rawData.split('\n');
+            const data = lines.map(line => {
+                const parts = line.split(',').map(Number);
+                if (parts.length === 3 && !parts.some(isNaN) && parts[0] < parts[1] && parts[2] >= 0) { // Li < Ls, f >= 0
+                    return { li: parts[0], ls: parts[1], f: parts[2], mi: (parts[0] + parts[1]) / 2 };
+                }
+                return null;
+            }).filter(item => item !== null);
+            return data;
+        }
+        
+        let datosAgrupadosGlobal = []; 
+        let mediaGlobalAgrupada = null;
+        let medianaGlobalAgrupada = null;
+        let modaGlobalAgrupada = null; // Puede ser número o string
+        let desviacionEstandarGlobalAgrupada = null;
+
+        function generarTablaFrecuencias() {
+            const datos = parseData('datosTablaFrec').sort((a, b) => a - b);
+            const resultadoDiv = document.getElementById('resultadoTablaFrecuencias');
+            if (datos.length === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">No se ingresaron datos válidos.</p>';
+                return;
+            }
+
+            const frecuencias = {};
+            datos.forEach(dato => {
+                frecuencias[dato] = (frecuencias[dato] || 0) + 1;
+            });
+
+            let tablaHTML = '<table class="min-w-full bg-white border border-pink-300 mt-3"><thead><tr class="bg-pink-100">';
+            tablaHTML += '<th class="py-2 px-3 border-b text-left">$x_i$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$f_i$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$h_i$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$h_i\\%$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$F_i$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$H_i$</th>';
+            tablaHTML += '<th class="py-2 px-3 border-b text-right">$H_i\\%$</th></tr></thead><tbody>';
+
+            let Fi = 0;
+            let Hi = 0;
+            const n = datos.length;
+
+            Object.keys(frecuencias).sort((a,b) => Number(a) - Number(b)).forEach(xi => {
+                const fi = frecuencias[xi];
+                const hi = fi / n;
+                Fi += fi;
+                Hi += hi;
+                tablaHTML += `<tr>
+                    <td class="py-2 px-3 border-b">${xi}</td>
+                    <td class="py-2 px-3 border-b text-right">${fi}</td>
+                    <td class="py-2 px-3 border-b text-right">${hi.toFixed(4)}</td>
+                    <td class="py-2 px-3 border-b text-right">${(hi * 100).toFixed(2)}%</td>
+                    <td class="py-2 px-3 border-b text-right">${Fi}</td>
+                    <td class="py-2 px-3 border-b text-right">${Hi.toFixed(4)}</td>
+                    <td class="py-2 px-3 border-b text-right">${(Hi * 100).toFixed(2)}%</td>
+                </tr>`;
+            });
+            tablaHTML += '</tbody></table>';
+            resultadoDiv.innerHTML = tablaHTML;
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+
+        function calcularMTCD() {
+            const datos = parseData('datosMTCDes').sort((a, b) => a - b);
+            const resultadoDiv = document.getElementById('resultadoMTCD');
+            if (datos.length === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">No se ingresaron datos válidos.</p>';
+                return;
+            }
+            const n = datos.length;
+            const suma = datos.reduce((acc, val) => acc + val, 0);
+            const media = suma / n;
+            let mediana;
+            if (n % 2 === 0) {
+                mediana = (datos[n / 2 - 1] + datos[n / 2]) / 2;
+            } else {
+                mediana = datos[Math.floor(n / 2)];
+            }
+            const freqs = {};
+            let maxFreq = 0;
+            datos.forEach(dato => {
+                freqs[dato] = (freqs[dato] || 0) + 1;
+                if (freqs[dato] > maxFreq) maxFreq = freqs[dato];
+            });
+            const modas = Object.keys(freqs).filter(key => freqs[key] === maxFreq);
+            let modaStr = modas.join(', ');
+            if (modas.length === n && n > 1 && maxFreq === 1) modaStr = "Amodal";
+            else if (modas.length > 1 && modas.length < n ) modaStr = `Multimodal: ${modas.join(', ')}`;
+            else if (modas.length === 0 || (maxFreq === 1 && n > 1)) modaStr = "Amodal";
+
+
+            resultadoDiv.innerHTML = `
+                <p><strong>Media ($\\overline{x}$):</strong> ${media.toFixed(4)}</p>
+                <p><strong>Mediana ($M_e$):</strong> ${mediana.toFixed(4)}</p>
+                <p><strong>Moda ($M_o$):</strong> ${modaStr}</p>
+            `;
+             if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+        
+        function calcularMTCAgrupados() {
+            datosAgrupadosGlobal = parseGroupedData('datosMTC Agr');
+            const resultadoDiv = document.getElementById('resultadoMTCAgrupados');
+            
+            if (datosAgrupadosGlobal.length === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">No se ingresaron datos de tabla válidos. Asegúrese que Límite Inferior < Límite Superior y Frecuencia >= 0.</p>';
+                mediaGlobalAgrupada = null; medianaGlobalAgrupada = null; modaGlobalAgrupada = null;
+                return;
+            }
+
+            let sumFiMi = 0;
+            let n = 0;
+            let Fi = 0;
+            const datosConAcumuladas = datosAgrupadosGlobal.map(d => {
+                sumFiMi += d.mi * d.f;
+                n += d.f;
+                Fi += d.f;
+                return { ...d, Fi_ant: Fi - d.f, Fi: Fi };
+            });
+            
+            mediaGlobalAgrupada = n > 0 ? sumFiMi / n : 0;
+
+            const posMediana = n / 2;
+            let intervaloMediano = null;
+            for (const d of datosConAcumuladas) {
+                if (d.Fi >= posMediana) {
+                    intervaloMediano = d;
+                    break;
+                }
+            }
+            medianaGlobalAgrupada = 0;
+            if (intervaloMediano && intervaloMediano.f > 0) {
+                const Li = intervaloMediano.li;
+                const Fi_ant = intervaloMediano.Fi_ant;
+                const fi = intervaloMediano.f;
+                const A = intervaloMediano.ls - intervaloMediano.li;
+                medianaGlobalAgrupada = Li + ((posMediana - Fi_ant) / fi) * A;
+            }
+
+            let maxFrecuencia = 0;
+            datosConAcumuladas.forEach(d => { if (d.f > maxFrecuencia) maxFrecuencia = d.f; });
+            const intervalosModales = datosConAcumuladas.filter(d => d.f === maxFrecuencia);
+            
+            let modaStr = "No calculada";
+            if (intervalosModales.length === 1 && maxFrecuencia > 0) {
+                const intervaloModal = intervalosModales[0];
+                const indexModal = datosConAcumuladas.indexOf(intervaloModal);
+                const Li = intervaloModal.li;
+                const fi = intervaloModal.f;
+                const fi_ant = (indexModal > 0) ? datosConAcumuladas[indexModal - 1].f : 0;
+                const fi_post = (indexModal < datosConAcumuladas.length - 1) ? datosConAcumuladas[indexModal + 1].f : 0;
+                const d1 = fi - fi_ant;
+                const d2 = fi - fi_post;
+                const A = intervaloModal.ls - intervaloModal.li;
+                if ((d1 + d2) > 0) {
+                    modaGlobalAgrupada = Li + (d1 / (d1 + d2)) * A;
+                    modaStr = modaGlobalAgrupada.toFixed(4);
+                } else if (d1 === 0 && d2 === 0 && datosConAcumuladas.length === 1) {
+                     modaGlobalAgrupada = intervaloModal.mi;
+                     modaStr = `Aprox. ${modaGlobalAgrupada.toFixed(4)} (marca de clase del único intervalo)`;
+                } else if (d1 === 0 && d2 === 0 && (fi_ant === fi && fi_post === fi)) { // plateau
+                     modaGlobalAgrupada = intervaloModal.mi;
+                     modaStr = `Centro del intervalo modal (plateau): ${modaGlobalAgrupada.toFixed(4)}`;
+                }
+                else {
+                     modaStr = "No se puede calcular (d1+d2=0, posible distr. uniforme o en extremos)";
+                }
+            } else if (intervalosModales.length > 1) {
+                 modaGlobalAgrupada = `Multimodal (frec. máx. ${maxFrecuencia})`;
+                 modaStr = modaGlobalAgrupada;
+            } else if (maxFrecuencia === 0 && n > 0) {
+                 modaGlobalAgrupada = "Amodal";
+                 modaStr = modaGlobalAgrupada;
+            }
+
+
+            resultadoDiv.innerHTML = `
+                <p><strong>Media ($\\overline{x}$):</strong> ${mediaGlobalAgrupada.toFixed(4)}</p>
+                <p><strong>Mediana ($M_e$):</strong> ${medianaGlobalAgrupada.toFixed(4)}</p>
+                <p><strong>Moda ($M_o$):</strong> ${modaStr}</p>
+                <small class="text-slate-500">Estos datos agrupados se usarán para Percentiles y Medidas de Dispersión Agrupadas.</small>
+            `;
+             if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+
+        function calcularPercentilAgrupados() {
+            const resultadoDiv = document.getElementById('resultadoPercentilAgrupados');
+            const k = parseInt(document.getElementById('valorKPercentil').value);
+
+            if (datosAgrupadosGlobal.length === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">Primero calcula las Medidas de Tendencia Central para datos agrupados.</p>';
+                return;
+            }
+            if (isNaN(k) || k < 1 || k > 99) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">Ingrese un valor de k válido (1-99).</p>';
+                return;
+            }
+
+            let n = 0;
+            let Fi = 0;
+            const datosConAcumuladas = datosAgrupadosGlobal.map(d => {
+                n += d.f;
+                Fi += d.f;
+                return { ...d, Fi_ant: Fi - d.f, Fi: Fi };
+            });
+
+            const posPercentil = (k * n) / 100;
+            let intervaloPercentil = null;
+            for (const d of datosConAcumuladas) {
+                if (d.Fi >= posPercentil) {
+                    intervaloPercentil = d;
+                    break;
+                }
+            }
+
+            let pk = 0;
+            if (intervaloPercentil && intervaloPercentil.f > 0) {
+                const Li = intervaloPercentil.li;
+                const Fi_ant = intervaloPercentil.Fi_ant;
+                const fi = intervaloPercentil.f;
+                const A = intervaloPercentil.ls - intervaloPercentil.li;
+                pk = Li + ((posPercentil - Fi_ant) / fi) * A;
+                resultadoDiv.innerHTML = `<p><strong>Percentil $P_{${k}}$:</strong> ${pk.toFixed(4)}</p>`;
+            } else {
+                resultadoDiv.innerHTML = `<p class="text-red-500">No se pudo encontrar el intervalo para $P_{${k}}$. Verifique que k (${k}) y n (${n}) sean válidos y que las frecuencias no sean todas cero.</p>`;
+            }
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+
+        function calcularMDD() {
+            const datos = parseData('datosMDDes').sort((a, b) => a - b);
+            const resultadoDiv = document.getElementById('resultadoMDD');
+            if (datos.length === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">No se ingresaron datos válidos.</p>';
+                return;
+            }
+            const n = datos.length;
+            const rango = datos[n - 1] - datos[0];
+            const suma = datos.reduce((acc, val) => acc + val, 0);
+            const media = suma / n;
+            const sumSqDiff = datos.reduce((acc, val) => acc + Math.pow(val - media, 2), 0);
+            const varianza = n > 1 ? sumSqDiff / (n - 1) : 0; // Muestral (n-1)
+            const desviacionEstandar = Math.sqrt(varianza);
+            const cv = media !== 0 ? (desviacionEstandar / media) * 100 : 0;
+            
+            resultadoDiv.innerHTML = `
+                <p><strong>Rango (R):</strong> ${rango.toFixed(4)}</p>
+                <p><strong>Media ($\\overline{x}$):</strong> ${media.toFixed(4)} (usada para cálculos)</p>
+                <p><strong>Varianza Muestral ($S^2$):</strong> ${varianza.toFixed(4)}</p>
+                <p><strong>Desviación Estándar Muestral (S):</strong> ${desviacionEstandar.toFixed(4)}</p>
+                <p><strong>Coeficiente de Variación (CV%):</strong> ${cv.toFixed(2)}%</p>
+            `;
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+        
+        function calcularMDAgrupados() {
+            const resultadoDiv = document.getElementById('resultadoMDAgrupados');
+            if (datosAgrupadosGlobal.length === 0 || mediaGlobalAgrupada === null) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">Primero calcula las Medidas de Tendencia Central para datos agrupados.</p>';
+                desviacionEstandarGlobalAgrupada = null;
+                return;
+            }
+
+            let n = 0;
+            let sumFiMiMenosMediaSq = 0;
+            
+            datosAgrupadosGlobal.forEach(d => {
+                n += d.f;
+                sumFiMiMenosMediaSq += d.f * Math.pow(d.mi - mediaGlobalAgrupada, 2);
+            });
+
+            const varianzaAgrupada = n > 1 ? sumFiMiMenosMediaSq / (n - 1) : 0; // Muestral (n-1)
+            desviacionEstandarGlobalAgrupada = Math.sqrt(varianzaAgrupada);
+            const cvAgrupado = mediaGlobalAgrupada !== 0 ? (desviacionEstandarGlobalAgrupada / mediaGlobalAgrupada) * 100 : 0;
+
+            resultadoDiv.innerHTML = `
+                <p>Usando Media Agrupada ($\\overline{x}$): ${mediaGlobalAgrupada.toFixed(4)}</p>
+                <p><strong>Varianza Muestral ($S^2$):</strong> ${varianzaAgrupada.toFixed(4)}</p>
+                <p><strong>Desviación Estándar Muestral (S):</strong> ${desviacionEstandarGlobalAgrupada.toFixed(4)}</p>
+                <p><strong>Coeficiente de Variación (CV%):</strong> ${cvAgrupado.toFixed(2)}%</p>
+            `;
+             if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+
+        function calcularAsimetria() {
+            const resultadoDiv = document.getElementById('resultadoAsimetria');
+            let mediaUsar = null;
+            let modaUsarNum = null; // Para la moda numérica
+            let modaUsarStr = null; // Para la moda como string (multimodal, amodal)
+            let medianaUsar = null;
+            let sUsar = null;
+            let tipoDatos = "";
+
+            if (datosAgrupadosGlobal.length > 0 && mediaGlobalAgrupada !== null && desviacionEstandarGlobalAgrupada !== null) {
+                mediaUsar = mediaGlobalAgrupada;
+                if (typeof modaGlobalAgrupada === 'number') modaUsarNum = modaGlobalAgrupada; else modaUsarStr = modaGlobalAgrupada;
+                medianaUsar = medianaGlobalAgrupada;
+                sUsar = desviacionEstandarGlobalAgrupada;
+                tipoDatos = "agrupados";
+            } else {
+                const datosDes = parseData('datosMDDes');
+                 if (datosDes.length > 0) {
+                    const n = datosDes.length;
+                    const suma = datosDes.reduce((acc, val) => acc + val, 0);
+                    mediaUsar = suma / n;
+                    datosDes.sort((a, b) => a - b);
+                    if (n % 2 === 0) medianaUsar = (datosDes[n / 2 - 1] + datosDes[n / 2]) / 2;
+                    else medianaUsar = datosDes[Math.floor(n / 2)];
+                    
+                    const freqs = {}; let maxFreq = 0;
+                    datosDes.forEach(dato => { freqs[dato] = (freqs[dato] || 0) + 1; if (freqs[dato] > maxFreq) maxFreq = freqs[dato]; });
+                    const modas = Object.keys(freqs).filter(key => freqs[key] === maxFreq).map(Number);
+                    
+                    if (modas.length === 1) modaUsarNum = modas[0];
+                    else if (modas.length > 1 && modas.length < n) modaUsarStr = `Multimodal: ${modas.join(', ')}`;
+                    else modaUsarStr = "Amodal";
+
+
+                    const sumSqDiff = datosDes.reduce((acc, val) => acc + Math.pow(val - mediaUsar, 2), 0);
+                    const varianza = n > 1 ? sumSqDiff / (n - 1) : 0;
+                    sUsar = Math.sqrt(varianza);
+                    tipoDatos = "no agrupados";
+                }
+            }
+
+            if (mediaUsar === null || sUsar === null || sUsar === 0) {
+                resultadoDiv.innerHTML = '<p class="text-red-500">Calcule primero la Media y Desviación Estándar. La Desv. Estándar no puede ser cero.</p>';
+                return;
+            }
+
+            let Ap1 = null, Ap2 = null;
+            let conclusion1 = "", conclusion2 = "";
+
+            if (modaUsarNum !== null) {
+                Ap1 = (mediaUsar - modaUsarNum) / sUsar;
+                if (Ap1 > 0.2) conclusion1 = "Asimetría Positiva (hacia la derecha).";
+                else if (Ap1 < -0.2) conclusion1 = "Asimetría Negativa (hacia la izquierda).";
+                else conclusion1 = "Distribución aproximadamente Simétrica.";
+            }
+            
+            if (medianaUsar !== null) {
+                 Ap2 = (3 * (mediaUsar - medianaUsar)) / sUsar;
+                 if (Ap2 > 0.2) conclusion2 = "Asimetría Positiva (hacia la derecha).";
+                 else if (Ap2 < -0.2) conclusion2 = "Asimetría Negativa (hacia la izquierda).";
+                 else conclusion2 = "Distribución aproximadamente Simétrica.";
+            }
+
+            let resultadoHTML = `<p>Resultados basados en datos ${tipoDatos}:</p>`;
+            if (Ap1 !== null) {
+                resultadoHTML += `<p><strong>Coef. Pearson (con Moda): $A_p = \\frac{\\overline{x} - M_o}{S} = ${Ap1.toFixed(4)}</strong>. Interpretación: ${conclusion1}</p>`;
+            } else {
+                 resultadoHTML += `<p>Coef. Pearson (con Moda): No se pudo calcular (Moda: ${modaUsarStr || 'No definida'}).</p>`;
+            }
+            if (Ap2 !== null) {
+                resultadoHTML += `<p class="mt-2"><strong>Coef. Pearson (con Mediana): $A_p = \\frac{3(\\overline{x} - M_e)}{S} = ${Ap2.toFixed(4)}</strong>. Interpretación: ${conclusion2}</p>`;
+            } else {
+                 resultadoHTML += `<p class="mt-2">Coef. Pearson (con Mediana): No se pudo calcular (Mediana no definida).</p>`;
+            }
+            resultadoDiv.innerHTML = resultadoHTML;
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([resultadoDiv]);
+        }
+        
+        function imprimirPagina() { window.print(); }
+    </script>
+</body>
+</html>

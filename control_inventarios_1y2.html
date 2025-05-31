@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Inventarios - Material de Estudio Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .content-section {
+            border-left-width: 4px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .calculator-input {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            margin-right: 5px;
+            width: 100px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Estilos para impresión */
+        @media print {
+            body {
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            nav {
+                display: none !important;
+            }
+            main {
+                margin-left: 0 !important;
+            }
+            .content-section {
+                border-left-width: 2px;
+                margin-bottom: 15px; /* Espacio entre secciones en PDF */
+                 page-break-inside: avoid; /* Evitar que las secciones se corten entre páginas */
+            }
+            h1, h2, h3 {
+                page-break-after: avoid; /* Evitar saltos de página después de los títulos */
+            }
+            .calculator-container, .interactive-table-container, .advanced-concepts {
+                page-break-inside: avoid;
+            }
+            button {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="min-h-screen flex flex-col print-container">
+
+        <header class="bg-slate-800 text-white p-6 shadow-lg no-print sticky top-0 z-50">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-3xl font-bold">🎓 Control de Inventarios: Guía Interactiva</h1>
+                <button onclick="imprimirPagina()" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                    📄 Descargar como PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="container mx-auto flex flex-grow mt-4">
+            <nav class="w-1/4 p-4 space-y-3 bg-white shadow-md rounded-lg sticky top-24 h-screen overflow-y-auto no-print mr-4">
+                <h2 class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">Temario 📚</h2>
+                <ul>
+                    <li><a href="#introduccion" class="block py-2 px-3 text-slate-600 hover:bg-sky-100 hover:text-sky-700 rounded-md transition duration-150">📜 Introducción</a></li>
+                    <li><a href="#gestion-materiales" class="block py-2 px-3 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 rounded-md transition duration-150">🚚 Gestión de Materiales</a></li>
+                    <li><a href="#adquisicion-control" class="block py-2 px-3 text-slate-600 hover:bg-amber-100 hover:text-amber-700 rounded-md transition duration-150">🛒 Adquisición y Control</a></li>
+                    <li><a href="#fabricar-comprar" class="block py-2 px-3 text-slate-600 hover:bg-rose-100 hover:text-rose-700 rounded-md transition duration-150">🏭 vs 🛍️ ¿Fabricar o Comprar?</a></li>
+                    <li><a href="#metodos-control" class="block py-2 px-3 text-slate-600 hover:bg-violet-100 hover:text-violet-700 rounded-md transition duration-150">🛠️ Métodos y Sistemas</a></li>
+                    <li><a href="#valorizacion" class="block py-2 px-3 text-slate-600 hover:bg-teal-100 hover:text-teal-700 rounded-md transition duration-150">💲 Valorización (FIFO, PPP)</a></li>
+                    <li><a href="#sistema-abc" class="block py-2 px-3 text-slate-600 hover:bg-orange-100 hover:text-orange-700 rounded-md transition duration-150">🅰️🅱️🅾️ Sistema ABC</a></li>
+                    <li><a href="#codificacion" class="block py-2 px-3 text-slate-600 hover:bg-cyan-100 hover:text-cyan-700 rounded-md transition duration-150">║█║ Codificación</a></li>
+                </ul>
+            </nav>
+
+            <main class="w-3/4 p-6 bg-white shadow-md rounded-lg">
+                <section id="introduccion" class="content-section border-sky-500 bg-sky-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-sky-700 mb-6">📜 Introducción al Control de Inventarios</h2>
+                    <p class="mb-4 text-lg">Las <strong class="text-sky-600">existencias o mercaderías</strong> son vitales para empresas productoras y comercializadoras. Un buen manejo de inventarios es crucial para el éxito.</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-2">🎯 Objetivos del Control de Inventarios:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Asegurar disponibilidad de productos para producción o venta.</li>
+                            <li>Minimizar costos de mantenimiento y pedido.</li>
+                            <li>Evitar pérdidas por deterioro, obsolescencia o robo.</li>
+                            <li>Optimizar la inversión en inventarios.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-red-50 border border-red-300 p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-red-600 mb-2">⚠️ Consecuencias de un Mal Manejo:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong class="text-red-500">Falta de stock:</strong> Pérdida de ventas, clientes insatisfechos, paralización de producción.</li>
+                            <li><strong class="text-red-500">Exceso de stock:</strong> Costos altos de almacenamiento, riesgo de obsolescencia, capital inmovilizado.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-2">⚖️ Relación Costo/Beneficio del Control:</h3>
+                        <p class="text-slate-700">Implementar controles tiene un costo, pero los beneficios (evitar pérdidas, optimizar compras, información precisa) suelen superarlo. Es clave encontrar un <strong class="text-sky-500">nivel de control razonable</strong> que no entorpezca la operación.</p>
+                        <img src="https://placehold.co/600x300/E0F2FE/0284C7?text=Gráfico+Costo+vs+Beneficio+del+Control" alt="Gráfico Costo vs Beneficio del Control" class="mt-3 rounded-lg shadow-sm mx-auto">
+                         <p class="text-xs text-center text-slate-500 mt-1">Idea: A más control, más costo. El beneficio aumenta hasta un punto, luego puede disminuir si el control es excesivo.</p>
+                    </div>
+                </section>
+
+                <section id="gestion-materiales" class="content-section border-emerald-500 bg-emerald-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-emerald-700 mb-6">🚚 Gestión de Materiales</h2>
+                    <p class="mb-4 text-lg">La gestión de materiales abarca desde la <strong class="text-emerald-600">compra</strong> hasta la <strong class="text-emerald-600">distribución</strong> del producto final. Incluye materias primas, productos en proceso y terminados.</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-emerald-600 mb-2">🔄 Flujo de Materiales:</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+                            <li><strong class="text-emerald-500">Compras:</strong> Adquisición oportuna de materiales/mercaderías.</li>
+                            <li><strong class="text-emerald-500">Transporte:</strong> Hacia la planta y fuera de ella.</li>
+                            <li><strong class="text-emerald-500">Producción y Control de Inventario:</strong> Mantener calidad y cantidades.</li>
+                            <li><strong class="text-emerald-500">Almacenamiento:</strong> Bodegaje adecuado.</li>
+                        </ol>
+                        <img src="https://placehold.co/600x200/D1FAE5/059669?text=Flujo+de+Administración+de+Materiales" alt="Flujo de Administración de Materiales" class="mt-3 rounded-lg shadow-sm mx-auto">
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-emerald-600 mb-2">📝 Función de Abastecimiento (Compras):</h3>
+                        <p class="text-slate-700 mb-2">Responsabilidades clave del departamento de compras:</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Identificar necesidades y fuentes de abastecimiento.</li>
+                            <li>Seleccionar proveedores y negociar contratos. 🤝</li>
+                            <li>Controlar eficiencia de proveedores.</li>
+                            <li>Evaluar si conviene fabricar artículos en lugar de comprarlos.</li>
+                            <li>Mantener registros actualizados (proveedores, precios, etc.). 🗂️</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="adquisicion-control" class="content-section border-amber-500 bg-amber-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-amber-700 mb-6">🛒 Adquisición y Control de Materiales</h2>
+                    <p class="mb-4 text-lg">El proceso de compra se inicia con una necesidad y sigue una serie de pasos para asegurar una adquisición eficiente y controlada.</p>
+
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-amber-600 mb-2">🔄 Proceso de Adquisición:</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-slate-700">
+                            <li><strong class="text-amber-500">Requerimiento de Materiales:</strong> Detección de la necesidad (déficit, nuevo producto). Se detallan especificaciones.</li>
+                            <li><strong class="text-amber-500">Autorización de Compra:</strong> Visto bueno de Finanzas o un directivo. Define prioridades. ✅</li>
+                            <li><strong class="text-amber-500">Cotizaciones:</strong> Obtener al menos 3 opciones para analizar precio, calidad, plazos, garantías. 📊</li>
+                            <li><strong class="text-amber-500">Autorización de Cotización:</strong> Selección de la mejor oferta (no siempre la más barata).</li>
+                            <li><strong class="text-amber-500">Orden de Compra (OC):</strong> Documento formal que inicia la relación comercial. Detalla producto, precio, condiciones. 📝</li>
+                        </ol>
+                         <img src="https://placehold.co/600x250/FEF3C7/D97706?text=Proceso+de+Adquisición+de+Materiales" alt="Proceso de Adquisición de Materiales" class="mt-3 rounded-lg shadow-sm mx-auto">
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-amber-600 mb-2">📦 Recepción y Verificación de Productos:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Verificar estado y <strong class="text-amber-500">calidad</strong> de los productos contra la guía de despacho/factura y la OC. (¡Importante para evitar problemas futuros!).</li>
+                            <li>Realizar conteos y ubicar en lugares aptos.</li>
+                            <li>Registrar ingresos en el sistema (Ej: Tarjeta de Control de Existencias).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-amber-600 mb-2">🅿️ Punto de Pedido (Calculadora):</h3>
+                        <p class="text-slate-700 mb-2">Nivel de existencia que dispara una nueva orden de compra.</p>
+                        <p class="mb-2 text-slate-700">Fórmula: <code class="bg-amber-200 text-amber-700 px-2 py-1 rounded">(Consumo Diario * Tiempo de Abastecimiento) + Stock de Seguridad</code></p>
+                        <div class="calculator-container space-y-2 p-3 bg-amber-100 rounded-md">
+                            <div>
+                                <label for="consumoDiario" class="text-sm font-medium text-slate-700">Consumo Diario (unidades):</label>
+                                <input type="number" id="consumoDiario" class="calculator-input" value="50">
+                            </div>
+                            <div>
+                                <label for="tiempoAbastecimiento" class="text-sm font-medium text-slate-700">Tiempo Abastecimiento (días):</label>
+                                <input type="number" id="tiempoAbastecimiento" class="calculator-input" value="3">
+                            </div>
+                            <div>
+                                <label for="stockSeguridad" class="text-sm font-medium text-slate-700">Stock Seguridad (unidades):</label>
+                                <input type="number" id="stockSeguridad" class="calculator-input" value="100">
+                            </div>
+                            <button onclick="calcularPuntoPedido()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Calcular</button>
+                            <p id="resultadoPuntoPedido" class="mt-2 text-lg font-semibold text-amber-700"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="fabricar-comprar" class="content-section border-rose-500 bg-rose-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-rose-700 mb-6">🏭 vs 🛍️ ¿Fabricar o Comprar?</h2>
+                    <p class="mb-4 text-lg">Una decisión estratégica importante. Implica análisis económicos y no económicos.</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-rose-600 mb-2">💸 Análisis Económico:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong class="text-rose-500">Costos Fijos (CF):</strong> No varían con el nivel de producción (alquiler, maquinaria).</li>
+                            <li><strong class="text-rose-500">Costos Variables (CV):</strong> Varían con la producción (materiales, mano de obra directa).</li>
+                            <li><strong class="text-rose-500">Costo de Comprar (CC):</strong> Precio unitario de compra * Cantidad.</li>
+                            <li><strong class="text-rose-500">Costo de Fabricar (CFa):</strong> Costos Fijos + (Costo Variable Unitario * Cantidad).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-rose-600 mb-2">⚖️ Punto de Equilibrio (Fabricar vs Comprar):</h3>
+                        <p class="text-slate-700 mb-2">Cantidad (Q) donde el costo de fabricar es igual al costo de comprar.</p>
+                        <p class="mb-2 text-slate-700">Fórmula: <code class="bg-rose-200 text-rose-700 px-2 py-1 rounded">CF + (CV_unitario * Q) = Precio_compra_unitario * Q</code></p>
+                        <div class="calculator-container space-y-2 p-3 bg-rose-100 rounded-md">
+                            <div>
+                                <label for="costoFijoFab" class="text-sm font-medium text-slate-700">Costos Fijos Totales Fabricación ($):</label>
+                                <input type="number" id="costoFijoFab" class="calculator-input" value="8000000">
+                            </div>
+                            <div>
+                                <label for="costoVariableUnitFab" class="text-sm font-medium text-slate-700">Costo Variable Unitario Fabricación ($):</label>
+                                <input type="number" id="costoVariableUnitFab" class="calculator-input" value="300">
+                            </div>
+                            <div>
+                                <label for="precioCompraUnit" class="text-sm font-medium text-slate-700">Precio Compra Unitario ($):</label>
+                                <input type="number" id="precioCompraUnit" class="calculator-input" value="500">
+                            </div>
+                            <button onclick="calcularPuntoEquilibrioFabCom()" class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">Calcular Punto Equilibrio</button>
+                            <p id="resultadoPuntoEquilibrioFabCom" class="mt-2 text-lg font-semibold text-rose-700"></p>
+                            <p id="decisionFabCom" class="mt-1 text-md text-slate-700"></p>
+                        </div>
+                        <img src="https://placehold.co/600x300/FFE4E6/E11D48?text=Gráfico+Fabricar+vs+Comprar" alt="Gráfico Fabricar vs Comprar" class="mt-3 rounded-lg shadow-sm mx-auto">
+                        <p class="text-xs text-center text-slate-500 mt-1">Idea: El gráfico muestra cómo los costos totales de comprar y fabricar varían con el volumen. El punto donde se cruzan es el punto de equilibrio.</p>
+                    </div>
+                </section>
+
+                <section id="metodos-control" class="content-section border-violet-500 bg-violet-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-violet-700 mb-6">🛠️ Métodos y Sistemas de Control</h2>
+                    <p class="mb-4 text-lg">Existen diversos métodos para controlar los inventarios, tanto desde una perspectiva contable como física.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-violet-600 mb-2">📚 Control Contable:</h3>
+                            <p class="text-slate-700">Registra cantidades teóricas y su valoración económica. Permite determinar:</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-2">
+                                <li>Monto invertido.</li>
+                                <li>Costo de artículos vendidos/producidos.</li>
+                                <li>Nivel de rotación.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-violet-600 mb-2">🔍 Control Físico:</h3>
+                            <p class="text-slate-700">Verifica la existencia real y el estado de los productos. Implica:</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-2">
+                                <li>Conteo, pesaje o medición.</li>
+                                <li>Inspección de calidad.</li>
+                                <li>Comparación con registros contables para identificar diferencias.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-6">
+                        <h3 class="text-xl font-semibold text-violet-600 mb-2">📋 Toma de Inventario Físico:</h3>
+                        <p class="text-slate-700 mb-2">Procedimiento de conteo total de productos almacenados. Consideraciones importantes:</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Personal capacitado e independiente.</li>
+                            <li>Control de movimientos durante el conteo (corte documentario).</li>
+                            <li>Realizar "de barrido" y etiquetar lo contado para evitar duplicidad.</li>
+                            <li>Preferiblemente con bodegas cerradas.</li>
+                            <li>Identificar productos dañados u obsoletos. 🕵️‍♂️</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow mb-6">
+                        <h3 class="text-xl font-semibold text-violet-600 mb-2">🏭 Tipos de Inventario (Según Etapa de Producción):</h3>
+                        <p class="text-slate-700 mb-2">Dependiendo de la empresa, los inventarios se pueden clasificar en:</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li><strong class="text-violet-500">Inventario de Materias Primas:</strong> Insumos básicos para la producción.</li>
+                            <li><strong class="text-violet-500">Inventario de Productos en Proceso:</strong> Artículos que están siendo transformados pero aún no están terminados.</li>
+                            <li><strong class="text-violet-500">Inventario de Productos Terminados:</strong> Mercancías listas para la venta.</li>
+                            <li><strong class="text-violet-500">Inventario de Suministros de Fábrica:</strong> Materiales no incorporados directamente al producto pero necesarios para la producción (ej. lubricantes, herramientas).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow advanced-concepts">
+                        <h3 class="text-xl font-semibold text-violet-600 mb-2">🚀 Conceptos Avanzados en Gestión de Inventarios:</h3>
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                            <li><strong class="text-violet-500">JIT (Justo a Tiempo):</strong> Técnica que busca reducir al mínimo los niveles de inventario. Los materiales llegan "justo a tiempo" para ser utilizados en el proceso de producción o para la venta. Requiere alta coordinación con proveedores.</li>
+                            <li><strong class="text-violet-500">MRP (Planeación de Requerimientos de Materiales):</strong> Sistema computarizado para planificar la producción y las compras. Determina qué, cuánto y cuándo se necesita cada material, basándose en el programa maestro de producción y la lista de materiales (BOM).</li>
+                            <li><strong class="text-violet-500">EOQ (Cantidad Económica de Pedido):</strong> Modelo matemático que ayuda a determinar la cantidad óptima de pedido para minimizar los costos totales de inventario (costos de pedido + costos de mantenimiento). Busca el equilibrio entre pedir mucho (altos costos de mantener) y pedir poco (altos costos de ordenar frecuentemente).</li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <section id="valorizacion" class="content-section border-teal-500 bg-teal-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-teal-700 mb-6">💲 Métodos de Valorización de Existencias</h2>
+                    <p class="mb-4 text-lg">Cuando los precios de compra varían, es necesario un método para valorizar las salidas de inventario (ventas, consumo, etc.).</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">➡️ FIFO (PEPS - Primeras en Entrar, Primeras en Salir)</h3>
+                            <p class="text-slate-700">Las primeras unidades compradas son las primeras en salir. El inventario final queda valorado a los costos más recientes.</p>
+                             <p class="text-xs text-slate-500 mt-1">Ventaja: Refleja costos de reposición más actuales en el inventario.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">⬅️ LIFO (UEPS - Últimas en Entrar, Primeras en Salir)</h3>
+                            <p class="text-slate-700">Las últimas unidades compradas son las primeras en salir. El inventario final queda valorado a los costos más antiguos. <span class="text-red-500">(Nota: No aceptado tributariamente en muchos países).</span></p>
+                            <p class="text-xs text-slate-500 mt-1">Ventaja: En épocas de inflación, puede reducir la utilidad gravable (si es permitido).</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold text-teal-600 mb-2">⚖️ PPP (Precio Promedio Ponderado)</h3>
+                            <p class="text-slate-700">Calcula un costo promedio después de cada compra. Las salidas se valoran a este costo promedio.</p>
+                            <p class="text-xs text-slate-500 mt-1">Ventaja: Suaviza las fluctuaciones de precios.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow interactive-table-container">
+                        <h3 class="text-xl font-semibold text-teal-600 mb-2">📊 Ejemplo Interactivo de Valorización:</h3>
+                        <p class="text-slate-700 mb-3">Ingresa movimientos y observa cómo cambian los saldos y costos según el método.</p>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <input type="date" id="fechaMov" class="calculator-input">
+                            <select id="tipoMov" class="calculator-input">
+                                <option value="compra">Compra</option>
+                                <option value="venta">Venta/Salida</option>
+                            </select>
+                            <input type="number" id="cantidadMov" placeholder="Cantidad" class="calculator-input">
+                            <input type="number" id="costoUnitMov" placeholder="Costo Unit. (si compra)" class="calculator-input">
+                            <button onclick="agregarMovimiento()" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-3 rounded-lg shadow">Agregar</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-300">
+                                <thead>
+                                    <tr class="bg-teal-100">
+                                        <th class="py-2 px-3 border-b text-left">Fecha</th>
+                                        <th class="py-2 px-3 border-b text-left">Descripción</th>
+                                        <th class="py-2 px-3 border-b text-right">Entrada (Uds)</th>
+                                        <th class="py-2 px-3 border-b text-right">Salida (Uds)</th>
+                                        <th class="py-2 px-3 border-b text-right">Saldo (Uds)</th>
+                                        <th class="py-2 px-3 border-b text-right">Costo Unit. ($)</th>
+                                        <th class="py-2 px-3 border-b text-right">Entrada ($)</th>
+                                        <th class="py-2 px-3 border-b text-right">Salida ($) (FIFO)</th>
+                                        <th class="py-2 px-3 border-b text-right">Saldo ($) (FIFO)</th>
+                                        <th class="py-2 px-3 border-b text-right">Salida ($) (PPP)</th>
+                                        <th class="py-2 px-3 border-b text-right">Saldo ($) (PPP)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaValorizacion">
+                                    </tbody>
+                            </table>
+                        </div>
+                         <p class="text-xs text-slate-500 mt-2">Nota: El método LIFO no se incluye en este ejemplo interactivo por su menor uso práctico y restricciones tributarias comunes.</p>
+                    </div>
+                </section>
+
+                <section id="sistema-abc" class="content-section border-orange-500 bg-orange-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-orange-700 mb-6">🅰️🅱️🅾️ Sistema de Control de Inventario ABC</h2>
+                    <p class="mb-4 text-lg">Clasifica los artículos del inventario en tres categorías (A, B, C) según su importancia en valor, para aplicar controles diferenciados.</p>
+                    <p class="text-slate-700 mb-4">"Una pequeña fracción de elementos representa una fracción mayoritaria en términos de efectos (valor)."</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-orange-600">
+                            <h3 class="text-xl font-semibold text-orange-600 mb-2">🅰️ Artículos A:</h3>
+                            <p class="text-slate-700">Pocos artículos (10-20%) pero de alto valor (70-80% del valor total del inventario).</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-2">
+                                <li>Control <strong class="text-orange-500">intenso</strong> y frecuente.</li>
+                                <li>Registros completos y seguros.</li>
+                                <li>Inventario de seguridad bajo.</li>
+                                <li>Pedidos cuidadosos y revisiones frecuentes.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500">
+                            <h3 class="text-xl font-semibold text-yellow-600 mb-2">🅱️ Artículos B:</h3>
+                            <p class="text-slate-700">Cantidad moderada (30-40%) y valor moderado (15-20%).</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-2">
+                                <li>Control <strong class="text-yellow-500">normal</strong>.</li>
+                                <li>Registros completos.</li>
+                                <li>Inventario de seguridad moderado.</li>
+                                <li>Pedidos normales, órdenes periódicas.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-lime-500">
+                            <h3 class="text-xl font-semibold text-lime-600 mb-2">🅾️ Artículos C:</h3>
+                            <p class="text-slate-700">Muchos artículos (40-50%) pero de bajo valor (5-10%).</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-2">
+                                <li>Control <strong class="text-lime-500">simple</strong>.</li>
+                                <li>Registros simplificados.</li>
+                                <li>Inventario de seguridad grande (si el costo de faltante es alto).</li>
+                                <li>Abastecimiento a mediano/largo plazo.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <img src="https://placehold.co/600x300/FFF7ED/F97316?text=Gráfico+Clasificación+ABC" alt="Gráfico Clasificación ABC (Pareto)" class="mt-3 rounded-lg shadow-sm mx-auto">
+                     <p class="text-xs text-center text-slate-500 mt-1">Idea: Similar al principio de Pareto (80/20). Enfocar esfuerzos en los artículos 'A'.</p>
+                </section>
+
+                <section id="codificacion" class="content-section border-cyan-500 bg-cyan-50 p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-3xl font-bold text-cyan-700 mb-6">║█║▌║█║ Codificación de Existencias</h2>
+                    <p class="mb-4 text-lg">La codificación identifica y registra los artículos, facilitando el control. El <strong class="text-cyan-600">código de barras</strong> es el sistema más efectivo.</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow mb-4">
+                        <h3 class="text-xl font-semibold text-cyan-600 mb-2">🌟 Beneficios del Código de Barras:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Captura automática de información (reduce errores de digitación). ⌨️➡️💻</li>
+                            <li>Automatización de procesos en la cadena de abastecimiento.</li>
+                            <li>Información rápida y oportuna. ⏱️</li>
+                            <li>Incremento en productividad y eficiencia.</li>
+                        </ul>
+                        <img src="https://placehold.co/300x150/CFFAFE/0891B2?text=Ejemplo+Código+de+Barras" alt="Ejemplo de Código de Barras" class="mt-3 rounded-lg shadow-sm mx-auto">
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-cyan-600 mb-2">🔑 Asignación y Ubicación:</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700">
+                            <li>Cada variación de producto (sabor, color, tamaño) debe tener un código <strong class="text-cyan-500">único</strong>.</li>
+                            <li>Identifica país, empresa y producto.</li>
+                            <li>Debe ubicarse en el empaque para fácil lectura por el scanner.</li>
+                        </ul>
+                    </div>
+                </section>
+                 <p class="text-center text-sm text-slate-500 mt-8">Fin del material de estudio. ¡Esperamos que esta guía interactiva te sea de gran utilidad! ✨</p>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Calculadora Punto de Pedido
+        function calcularPuntoPedido() {
+            const consumoDiario = parseFloat(document.getElementById('consumoDiario').value) || 0;
+            const tiempoAbastecimiento = parseFloat(document.getElementById('tiempoAbastecimiento').value) || 0;
+            const stockSeguridad = parseFloat(document.getElementById('stockSeguridad').value) || 0;
+
+            if (consumoDiario <= 0 || tiempoAbastecimiento < 0 || stockSeguridad < 0) {
+                 document.getElementById('resultadoPuntoPedido').textContent = 'Por favor, ingrese valores válidos y positivos.';
+                 return;
+            }
+            
+            const puntoPedido = (consumoDiario * tiempoAbastecimiento) + stockSeguridad;
+            document.getElementById('resultadoPuntoPedido').textContent = `Punto de Pedido: ${puntoPedido.toFixed(0)} unidades. Cuando el stock llegue a esta cantidad, se debe realizar un nuevo pedido.`;
+        }
+
+        // Calculadora Fabricar o Comprar
+        function calcularPuntoEquilibrioFabCom() {
+            const cf = parseFloat(document.getElementById('costoFijoFab').value) || 0;
+            const cvUnit = parseFloat(document.getElementById('costoVariableUnitFab').value) || 0;
+            const pCompraUnit = parseFloat(document.getElementById('precioCompraUnit').value) || 0;
+            const resultadoElem = document.getElementById('resultadoPuntoEquilibrioFabCom');
+            const decisionElem = document.getElementById('decisionFabCom');
+
+            if (cf < 0 || cvUnit < 0 || pCompraUnit <= 0) {
+                resultadoElem.textContent = 'Por favor, ingrese costos y precios válidos (positivos, precio compra > 0).';
+                decisionElem.textContent = '';
+                return;
+            }
+
+            if (pCompraUnit <= cvUnit) {
+                resultadoElem.textContent = 'El precio de compra unitario debe ser mayor que el costo variable unitario de fabricación para un punto de equilibrio significativo.';
+                if (cf === 0 && pCompraUnit > cvUnit) {
+                     decisionElem.textContent = 'Si no hay costos fijos, siempre convendrá fabricar si CV unitario < Precio Compra.';
+                } else if (cf > 0) {
+                    decisionElem.textContent = 'Si el precio de compra es menor o igual al costo variable de fabricar, y hay costos fijos, siempre convendrá comprar (o no producir si el precio de compra es muy bajo).';
+                } else {
+                    decisionElem.textContent = '';
+                }
+                return;
+            }
+
+            const qEquilibrio = cf / (pCompraUnit - cvUnit);
+            resultadoElem.textContent = `Punto de Equilibrio: ${qEquilibrio.toFixed(2)} unidades.`;
+            
+            let decisionText = `Con esta cantidad, es indiferente fabricar o comprar. `;
+            decisionText += `Si se necesitan MÁS de ${qEquilibrio.toFixed(2)} unidades, conviene FABRICAR. `;
+            decisionText += `Si se necesitan MENOS de ${qEquilibrio.toFixed(2)} unidades, conviene COMPRAR.`;
+            decisionElem.innerHTML = decisionText;
+
+            // Ejemplo práctico con una cantidad hipotética
+            const cantidadEjemplo = qEquilibrio + 100; // o qEquilibrio - 100 para probar el otro caso
+            const costoFabricarEj = cf + (cvUnit * cantidadEjemplo);
+            const costoComprarEj = pCompraUnit * cantidadEjemplo;
+            decisionElem.innerHTML += `<br><br><strong>Ejemplo:</strong> Para ${cantidadEjemplo.toFixed(0)} unidades: <br>Costo Fabricar = $${costoFabricarEj.toLocaleString('es-CL')} <br>Costo Comprar = $${costoComprarEj.toLocaleString('es-CL')}.`;
+             if(costoFabricarEj < costoComprarEj){
+                decisionElem.innerHTML += `<br>➡️ Conviene Fabricar.`;
+            } else if (costoComprarEj < costoFabricarEj) {
+                decisionElem.innerHTML += `<br>➡️ Conviene Comprar.`;
+            } else {
+                decisionElem.innerHTML += `<br>➡️ Costos Iguales.`;
+            }
+        }
+
+        // Lógica para tabla de valorización interactiva
+        let inventarioFIFO = []; // Array de objetos: {cantidad, costoUnitario}
+        let saldoCantidadTotal = 0;
+        let saldoValorTotalFIFO = 0;
+        
+        let saldoValorTotalPPP = 0;
+        let costoPromedioPonderado = 0;
+
+        function agregarMovimiento() {
+            const fechaInput = document.getElementById('fechaMov');
+            const tipo = document.getElementById('tipoMov').value;
+            const cantidadInput = document.getElementById('cantidadMov');
+            const costoUnitInput = document.getElementById('costoUnitMov');
+            
+            const fecha = fechaInput.value;
+            const cantidad = parseInt(cantidadInput.value);
+            let costoUnit = parseFloat(costoUnitInput.value);
+            const tablaBody = document.getElementById('tablaValorizacion');
+
+            if (!fecha || isNaN(cantidad) || cantidad <= 0) {
+                alert("Por favor, ingrese fecha y cantidad válidas.");
+                return;
+            }
+            if (tipo === 'compra' && (isNaN(costoUnit) || costoUnit <= 0)) {
+                alert("Por favor, ingrese un costo unitario válido para la compra.");
+                return;
+            }
+
+            let descripcion = "";
+            let entradaCantidad = 0;
+            let salidaCantidad = 0;
+            let entradaValor = 0;
+            let salidaValorFIFO = 0;
+            let salidaValorPPP = 0;
+
+
+            if (tipo === 'compra') {
+                descripcion = "Compra";
+                entradaCantidad = cantidad;
+                inventarioFIFO.push({ cantidad: cantidad, costoUnitario: costoUnit });
+                saldoCantidadTotal += cantidad;
+                entradaValor = cantidad * costoUnit;
+                saldoValorTotalFIFO += entradaValor;
+
+                // PPP
+                saldoValorTotalPPP += entradaValor;
+                costoPromedioPonderado = saldoCantidadTotal > 0 ? saldoValorTotalPPP / saldoCantidadTotal : 0;
+
+            } else { // Venta/Salida
+                descripcion = "Venta/Salida";
+                salidaCantidad = cantidad;
+                if (cantidad > saldoCantidadTotal) {
+                    alert("No hay suficiente stock para esta salida.");
+                    return;
+                }
+                
+                // Lógica FIFO para salida
+                let cantidadSalidaRestanteFIFO = cantidad;
+                let tempInventarioFIFO = JSON.parse(JSON.stringify(inventarioFIFO)); // Copia profunda para simular
+                
+                while (cantidadSalidaRestanteFIFO > 0 && tempInventarioFIFO.length > 0) {
+                    let loteActual = tempInventarioFIFO[0];
+                    if (loteActual.cantidad <= cantidadSalidaRestanteFIFO) {
+                        salidaValorFIFO += loteActual.cantidad * loteActual.costoUnitario;
+                        cantidadSalidaRestanteFIFO -= loteActual.cantidad;
+                        tempInventarioFIFO.shift(); 
+                    } else {
+                        salidaValorFIFO += cantidadSalidaRestanteFIFO * loteActual.costoUnitario;
+                        loteActual.cantidad -= cantidadSalidaRestanteFIFO; // Esto se hace en la copia
+                        cantidadSalidaRestanteFIFO = 0;
+                    }
+                }
+                 // Aplicar cambios al inventarioFIFO real
+                let cantidadSalidaRestanteRealFIFO = cantidad;
+                while(cantidadSalidaRestanteRealFIFO > 0 && inventarioFIFO.length > 0){
+                    let loteActualReal = inventarioFIFO[0];
+                     if (loteActualReal.cantidad <= cantidadSalidaRestanteRealFIFO) {
+                        cantidadSalidaRestanteRealFIFO -= loteActualReal.cantidad;
+                        inventarioFIFO.shift(); 
+                    } else {
+                        loteActualReal.cantidad -= cantidadSalidaRestanteRealFIFO;
+                        cantidadSalidaRestanteRealFIFO = 0;
+                    }
+                }
+                saldoValorTotalFIFO -= salidaValorFIFO;
+                
+                // Lógica PPP para salida
+                salidaValorPPP = cantidad * costoPromedioPonderado;
+                saldoValorTotalPPP -= salidaValorPPP;
+                
+                saldoCantidadTotal -= cantidad;
+                if (saldoCantidadTotal === 0) {
+                    costoPromedioPonderado = 0; 
+                    saldoValorTotalPPP = 0; 
+                } else {
+                     costoPromedioPonderado = saldoValorTotalPPP / saldoCantidadTotal; 
+                }
+                 costoUnit = 0; 
+            }
+
+            const newRow = tablaBody.insertRow();
+            newRow.innerHTML = `
+                <td class="py-2 px-3 border-b">${fecha}</td>
+                <td class="py-2 px-3 border-b">${descripcion}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'compra' ? cantidad : ''}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'venta' ? cantidad : ''}</td>
+                <td class="py-2 px-3 border-b text-right">${saldoCantidadTotal}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'compra' ? costoUnit.toFixed(2) : (tipo === 'venta' && saldoCantidadTotal >= 0 ? costoPromedioPonderado.toFixed(2) : '')}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'compra' ? entradaValor.toFixed(2) : ''}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'venta' ? salidaValorFIFO.toFixed(2) : ''}</td>
+                <td class="py-2 px-3 border-b text-right text-blue-600 font-semibold">${saldoValorTotalFIFO.toFixed(2)}</td>
+                <td class="py-2 px-3 border-b text-right">${tipo === 'venta' ? salidaValorPPP.toFixed(2) : ''}</td>
+                <td class="py-2 px-3 border-b text-right text-green-600 font-semibold">${saldoValorTotalPPP.toFixed(2)}</td>
+            `;
+            
+            // Limpiar campos de entrada
+            cantidadInput.value = '';
+            costoUnitInput.value = '';
+            // Opcional: limpiar fecha o mover al siguiente día
+            // fechaInput.value = ''; 
+        }
+        
+        // Función para imprimir la página
+        function imprimirPagina() {
+            window.print();
+        }
+
+        // Inicializar calculadoras al cargar
+        window.onload = () => {
+            calcularPuntoPedido();
+            calcularPuntoEquilibrioFabCom();
+            // Establecer fecha actual por defecto en el input de fecha para la tabla de valorización
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaMov').value = today;
+        }
+
+    </script>
+</body>
+</html>
